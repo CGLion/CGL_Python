@@ -4,7 +4,7 @@ Written by Oded Erell - CG-Lion Studio (c)2020
 """
 
 
-def get_pixel_from_uv(u, v, w, h):
+def cgl_get_pixel_from_uv(u, v, w, h):
     """
     Returns an Tuple containing 2D integer coordinates
     of the pixel corresponding to the supplied UV coordinates and image width and height in pixels.
@@ -22,7 +22,7 @@ def get_pixel_from_uv(u, v, w, h):
     return int(round(u * (w - 1))), int(round(v * (h - 1)))
 
 
-def get_integer_line_pixels(x0, y0, x1, y1):
+def cgl_get_integer_line_pixels(x0, y0, x1, y1):
     """
     Returns a list of integer tuples
     representing 2D coordinated of the pixels plotting a line from point 0 to point 1
@@ -77,9 +77,10 @@ def get_integer_line_pixels(x0, y0, x1, y1):
     return line_px
 
 
-def get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
+def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
     """
     Returns a string rendering of the supplied canvas coordinated and pixel list.
+    Intended to output a graphic easter in an ascii output console
     :param canvas_corner_a: Int Tuple of canvas first corner
     :param canvas_corner_b: Int Tuple of canvas second corner
     :param pixels: List of Int Tuple objects representing pixel coordinates to be drawn
@@ -103,8 +104,8 @@ def get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", p
 """
 Example:
 """
-px0 = get_pixel_from_uv(0.4, 0.1, 80, 40)
-px1 = get_pixel_from_uv(0.6, 0.9, 80, 40)
-pxlist = get_integer_line_pixels(px0[0], px0[1], px1[0], px1[1])
-output = get_pixel_plot_string((0, 0), (79, 39), pxlist)
+px0 = cgl_get_pixel_from_uv(0.4, 0.1, 80, 40)
+px1 = cgl_get_pixel_from_uv(0.6, 0.9, 80, 40)
+pxlist = cgl_get_integer_line_pixels(px0[0], px0[1], px1[0], px1[1])
+output = cgl_get_pixel_plot_string((0, 0), (79, 39), pxlist)
 print(output)
