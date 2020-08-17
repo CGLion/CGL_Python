@@ -22,7 +22,7 @@ def cgl_get_pixel_from_uv(u, v, w, h):
     return int(round(u * (w - 1))), int(round(v * (h - 1)))
 
 
-def cgl_get_integer_line_pixels(x0, y0, x1, y1):
+def cgl_line_raster_pixels(x0, y0, x1, y1):
     """
     Returns a list of integer tuples
     representing 2D coordinated of the pixels plotting a line from point 0 to point 1
@@ -106,6 +106,6 @@ Example:
 """
 px0 = cgl_get_pixel_from_uv(0.4, 0.1, 80, 40)
 px1 = cgl_get_pixel_from_uv(0.6, 0.9, 80, 40)
-pxlist = cgl_get_integer_line_pixels(px0[0], px0[1], px1[0], px1[1])
+pxlist = cgl_line_raster_pixels(px0[0], px0[1], px1[0], px1[1])
 output = cgl_get_pixel_plot_string((0, 0), (79, 39), pxlist)
 print(output)
