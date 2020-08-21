@@ -22,24 +22,22 @@ def cgl_get_pixel_from_uv(u, v, w, h):
     return int(round(u * (w - 1))), int(round(v * (h - 1)))
 
 
-def cgl_line_raster_pixels(x0, y0, x1, y1):
+def cgl_line_raster_pixels(p0, p1):
     """
     Returns a list of integer tuples
     representing 2D coordinated of the pixels plotting a line from point 0 to point 1
-    as defined by the supplied x0, y0, x1, y1 integer arguments.
+    as defined by the supplied p0, p1 integer tuple arguments.
     This function is based on the Bresenham line algorithm as it's explained in wikipedia:
     https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     And is expended to handle the cases where teh line slope is larger than 1 i.e delta Y is larger than delta X,
     and also cases where the the line is drawn "backwards" for a large X or Y to a small X or Y.
-    :param x0: Int - the x coordinate of point 0
-    :param y0: Int - the y coordinate of point 0
-    :param x1: Int - the x coordinate of point 1
-    :param y1: Int - the y coordinate of point 1
+    :param p0: Tuple - Int - the x,y coordinate of point 0
+    :param p1: Tuple - Int - the x,y coordinate of point 1
     :return: list of integer tuples
     """
     # store line coords in 2d array:
-    ln = [[x0, y0],
-          [x1, y1]]
+    ln = [[p0[0], p0[1]],
+          [p1[0], p1[1]]]
     # Make sure input values ar integers:
     for i in range(2):
         for j in range(2):
@@ -77,10 +75,39 @@ def cgl_line_raster_pixels(x0, y0, x1, y1):
     return line_px
 
 
+def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
+    """
+    Returns a list of tuples representing the raster pixels of the contour of triangle p0, p1, p2
+    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
+    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
+    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
+    :return: list of integer tuples
+    """
+    points = [p0, p1, p2]
+    tri_px = []
+    for i in range(3):
+        tri_px += (cgl_line_raster_pixels(points[i], points[(i + 1) % 3]))[1:]
+    return tri_px
+
+
+def cgl_get_triangle_raster_pixels(p0, p1, p2):
+    points = [p0, p1, p2]
+    sorted_y = sorted(points, key=lambda x: x[1])
+    line_a = cgl_line_raster_pixels(sorted_y[0], sorted_y[2])
+    line_b = cgl_line_raster_pixels(sorted_y[0], sorted_y[1])
+    line_c = cgl_line_raster_pixels(sorted_y[1], sorted_y[2])
+    tri_fill = []
+    for i in list(range(len(line_a)))[1:-1]:
+        x_vals = list(range(line_a[i][0], line_b[i][0]))[1:] # you shouldnt be iterating line_b as is, just uinique y
+        y_vals = [line_a[i][1]] * len(x_vals)
+        tri_fill += zip()
+    return tri_px
+
+
 def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
     """
     Returns a string rendering of the supplied canvas coordinated and pixel list.
-    Intended to output a graphic easter in an ascii output console
+    Intended to output a graphic raster of ascii chars in an output console
     :param canvas_corner_a: Int Tuple of canvas first corner
     :param canvas_corner_b: Int Tuple of canvas second corner
     :param pixels: List of Int Tuple objects representing pixel coordinates to be drawn
@@ -104,8 +131,10 @@ def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0
 """
 Example:
 """
-px0 = cgl_get_pixel_from_uv(0.4, 0.1, 80, 40)
-px1 = cgl_get_pixel_from_uv(0.6, 0.9, 80, 40)
-pxlist = cgl_line_raster_pixels(px0[0], px0[1], px1[0], px1[1])
-output = cgl_get_pixel_plot_string((0, 0), (79, 39), pxlist)
+px0 = cgl_get_pixel_from_uv(0.2, 0.8, 80, 40)
+px1 = cgl_get_pixel_from_uv(0.6, 0.5, 80, 40)
+px2 = cgl_get_pixel_from_uv(0.4, 0.2, 80, 40)
+# pxlist = cgl_line_raster_pixels(px0, px1)
+trilist = cgl_get_triangle_lines_raster_pixels(px0, px1, px2)
+output = cgl_get_pixel_plot_string((0, 0), (79, 39), trilist)
 print(output)
