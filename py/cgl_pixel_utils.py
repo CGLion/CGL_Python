@@ -22,6 +22,22 @@ def cgl_get_pixel_from_uv(u, v, w, h):
     return int(round(u * (w - 1))), int(round(v * (h - 1)))
 
 
+def cgl_get_pixel_uv(x, y, w, h):
+    """
+    Return a tuple containing floats representing UV coordinates of the center of the supplied pixel.
+    :param x: Int - the pixel x coordinate
+    :param y: Int - the pixel y coordinate
+    :param w: Int - The image width
+    :param h: Int - The image Height
+    :return: Tuple containing Floats
+    """
+    px_u_step = 1.0 / w
+    px_v_step = 1.0 / h
+    x = int(max(min(x, w - 1), 0))
+    y = int(max(min(y, h - 1), 0))
+    return (x * px_u_step) + (px_u_step * 0.5), (y * px_v_step) + (px_v_step * 0.5)
+
+
 def cgl_line_raster_pixels(p0, p1):
     """
     Returns a list of integer tuples
@@ -90,12 +106,13 @@ def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
     return tri_px
 
 
-def cgl_get_triangle_fill_raster_pixels(p0, p1, p2):
+def cgl_get_triangle_raster_pixels(p0, p1, p2, lines=True):
     """
     Returns a list of tuples representing the raster pixels of the filled area of triangle p0, p1, p2 (without contours)
     :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
     :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
     :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
+    :param lines: bool - when True, the output list will include the triangle contours
     :return: list of integer tuples
     """
     points = [p0, p1, p2]
@@ -114,18 +131,11 @@ def cgl_get_triangle_fill_raster_pixels(p0, p1, p2):
             y_vals = [new_y_val] * len(x_vals)
             tri_fill += zip(x_vals, y_vals)
             y_val = new_y_val
-    return tri_fill
-
-
-def cgl_get_triangle_raster_pixels(p0, p1, p2):
-    """
-    Returns a list of tuples representing the raster pixels of triangle p0, p1, p2 (fill and contours)
-    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
-    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
-    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
-    :return: list of integer tuples
-    """
-    return cgl_get_triangle_lines_raster_pixels(p0, p1, p2) + cgl_get_triangle_fill_raster_pixels(p0, p1, p2)
+    if lines:
+        outlist = tri_fill + line_a[1:] + line_b[1:] + line_c[1:]
+    else:
+        outlist = tri_fill
+    return outlist
 
 
 def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
