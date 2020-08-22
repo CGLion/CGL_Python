@@ -50,14 +50,14 @@ def cgl_line_raster_pixels(p0, p1):
     # Set main iteration axis:
     mx = 0 if abs(d[0]) > abs(d[1]) else 1
     # Set if secondary increment is positive or negative
-    inc = 1 if d[1-mx] >= 0 else -1
+    inc = 1 if d[1 - mx] >= 0 else -1
     # Make delta values absolute
     d[0] = abs(d[0])
     d[1] = abs(d[1])
     # Set init derivation:
-    di = (2 * d[1-mx]) - d[mx]
+    di = (2 * d[1 - mx]) - d[mx]
     # Set secondary axis start value:
-    sec = ln[0][1-mx]
+    sec = ln[0][1 - mx]
     # Generate main axis value range:
     mrange = range(ln[0][mx], ln[1][mx] + 1) if ln[0][mx] < ln[1][mx] else range(ln[0][mx], ln[1][mx] - 1, -1)
     # Interate main axis coordinate range:
@@ -70,7 +70,7 @@ def cgl_line_raster_pixels(p0, p1):
             sec = sec + inc
             di = di - (2 * d[mx])
         # Update derivation:
-        di = di + (2 * d[1-mx])
+        di = di + (2 * d[1 - mx])
     # Return output list:
     return line_px
 
@@ -90,18 +90,42 @@ def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
     return tri_px
 
 
-def cgl_get_triangle_raster_pixels(p0, p1, p2):
+def cgl_get_triangle_fill_raster_pixels(p0, p1, p2):
+    """
+    Returns a list of tuples representing the raster pixels of the filled area of triangle p0, p1, p2 (without contours)
+    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
+    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
+    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
+    :return: list of integer tuples
+    """
     points = [p0, p1, p2]
     sorted_y = sorted(points, key=lambda x: x[1])
     line_a = cgl_line_raster_pixels(sorted_y[0], sorted_y[2])
     line_b = cgl_line_raster_pixels(sorted_y[0], sorted_y[1])
     line_c = cgl_line_raster_pixels(sorted_y[1], sorted_y[2])
     tri_fill = []
+    y_val = line_a[0][1]
     for i in list(range(len(line_a)))[1:-1]:
-        x_vals = list(range(line_a[i][0], line_b[i][0]))[1:] # you shouldnt be iterating line_b as is, just uinique y
-        y_vals = [line_a[i][1]] * len(x_vals)
-        tri_fill += zip()
-    return tri_px
+        new_y_val = line_a[i][1]
+        if new_y_val != y_val:
+            sec_line = line_b if new_y_val <= line_b[-1][1] else line_c
+            sec_index = list(zip(*sec_line))[1].index(new_y_val)
+            x_vals = list(range(line_a[i][0], sec_line[sec_index][0]))[1:]
+            y_vals = [new_y_val] * len(x_vals)
+            tri_fill += zip(x_vals, y_vals)
+            y_val = new_y_val
+    return tri_fill
+
+
+def cgl_get_triangle_raster_pixels(p0, p1, p2):
+    """
+    Returns a list of tuples representing the raster pixels of triangle p0, p1, p2 (fill and contours)
+    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
+    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
+    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
+    :return: list of integer tuples
+    """
+    return cgl_get_triangle_lines_raster_pixels(p0, p1, p2) + cgl_get_triangle_fill_raster_pixels(p0, p1, p2)
 
 
 def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
@@ -131,10 +155,10 @@ def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0
 """
 Example:
 """
-px0 = cgl_get_pixel_from_uv(0.2, 0.8, 80, 40)
-px1 = cgl_get_pixel_from_uv(0.6, 0.5, 80, 40)
-px2 = cgl_get_pixel_from_uv(0.4, 0.2, 80, 40)
+px0 = cgl_get_pixel_from_uv(0.1, 0.1, 80, 40)
+px1 = cgl_get_pixel_from_uv(0.6, 0.1, 80, 40)
+px2 = cgl_get_pixel_from_uv(0.1, 0.6, 80, 40)
 # pxlist = cgl_line_raster_pixels(px0, px1)
-trilist = cgl_get_triangle_lines_raster_pixels(px0, px1, px2)
+trilist = cgl_get_triangle_raster_pixels(px0, px1, px2)
 output = cgl_get_pixel_plot_string((0, 0), (79, 39), trilist)
 print(output)
