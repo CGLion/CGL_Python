@@ -4,16 +4,16 @@ Written by Oded Erell - CG-Lion Studio (c)2020
 """
 
 
-def cgl_get_pixel_from_uv(u, v, w, h):
+def cgl_get_pixel_from_uv(u: float, v: float, w: int, h: int) -> tuple[int, int]:
     """
     Returns an Tuple containing 2D integer coordinates
     of the pixel corresponding to the supplied UV coordinates and image width and height in pixels.
     The supplied u and v arguments are clamped to a 0.0 - 1.0 range.
-    :param u: Float - [0.0 - 1.0] - Supplied U coordinate
-    :param v: Float - [0.0 - 1.0] - Supplied V coordinate
-    :param w: Int - The image width in pixels
-    :param h: Int - The image height in pixels
-    :return: Tuple containing integers
+    :param u: float - [0.0 - 1.0] - Supplied U coordinate
+    :param v: float - [0.0 - 1.0] - Supplied V coordinate
+    :param w: int - The image width in pixels
+    :param h: int - The image height in pixels
+    :return: tuple[int, int]
     """
     # Clamp the UV values
     u = max(min(u, 1.0), 0.0)
@@ -25,11 +25,11 @@ def cgl_get_pixel_from_uv(u, v, w, h):
 def cgl_get_pixel_uv(x, y, w, h):
     """
     Return a tuple containing floats representing UV coordinates of the center of the supplied pixel.
-    :param x: Int - the pixel x coordinate
-    :param y: Int - the pixel y coordinate
-    :param w: Int - The image width
-    :param h: Int - The image Height
-    :return: Tuple containing Floats
+    :param x: int - the pixel x coordinate
+    :param y: int - the pixel y coordinate
+    :param w: int - The image width
+    :param h: int - The image Height
+    :return: tuple[float, float]
     """
     px_u_step = 1.0 / w
     px_v_step = 1.0 / h
@@ -47,9 +47,9 @@ def cgl_line_raster_pixels(p0, p1):
     https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     And is expended to handle the cases where teh line slope is larger than 1 i.e delta Y is larger than delta X,
     and also cases where the the line is drawn "backwards" for a large X or Y to a small X or Y.
-    :param p0: Tuple - Int - the x,y coordinate of point 0
-    :param p1: Tuple - Int - the x,y coordinate of point 1
-    :return: list of integer tuples
+    :param p0: tuple[int, int] - the x,y coordinate of point 0
+    :param p1: tuple[int, int] - the x,y coordinate of point 1
+    :return: list[tuple[int, int]]
     """
     # store line coords in 2d array:
     ln = [[p0[0], p0[1]],
@@ -94,10 +94,10 @@ def cgl_line_raster_pixels(p0, p1):
 def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
     """
     Returns a list of tuples representing the raster pixels of the contour of triangle p0, p1, p2
-    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
-    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
-    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
-    :return: list of integer tuples
+    :param p0: tuple[int, int] - integer x, y coordinates of pixel 0 of the triangle
+    :param p1: tuple[int, int] - integer x, y coordinates of pixel 1 of the triangle
+    :param p2: tuple[int, int] - integer x, y coordinates of pixel 2 of the triangle
+    :return: list[tuple[int, int]]
     """
     points = [p0, p1, p2]
     tri_px = []
@@ -109,11 +109,11 @@ def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
 def cgl_get_triangle_raster_pixels(p0, p1, p2, lines=True):
     """
     Returns a list of tuples representing the raster pixels of the filled area of triangle p0, p1, p2 (without contours)
-    :param p0: tuple - integer - integer x, y coordinates of pixel 0 of the triangle
-    :param p1: tuple - integer - integer x, y coordinates of pixel 1 of the triangle
-    :param p2: tuple - integer - integer x, y coordinates of pixel 2 of the triangle
+    :param p0: tuple[int, int] - integer x, y coordinates of pixel 0 of the triangle
+    :param p1: tuple[int, int] - integer x, y coordinates of pixel 1 of the triangle
+    :param p2: tuple[int, int] - integer x, y coordinates of pixel 2 of the triangle
     :param lines: bool - when True, the output list will include the triangle contours
-    :return: list of integer tuples
+    :return: list[tuple[int, int]]
     """
     points = [p0, p1, p2]
     sorted_y = sorted(points, key=lambda x: x[1])
@@ -142,11 +142,11 @@ def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0
     """
     Returns a string rendering of the supplied canvas coordinated and pixel list.
     Intended to output a graphic raster of ascii chars in an output console
-    :param canvas_corner_a: Int Tuple of canvas first corner
-    :param canvas_corner_b: Int Tuple of canvas second corner
-    :param pixels: List of Int Tuple objects representing pixel coordinates to be drawn
-    :param blank: The char that will be drawn as blank canvas
-    :param plot: The char that will be drawn as pixel
+    :param canvas_corner_a: tuple[int, int] - coordinates of canvas first corner
+    :param canvas_corner_b: tuple[int, int] - coordinates of canvas second corner
+    :param pixels: list[tuple[int, int]] - pixels coordinates to be drawn
+    :param blank: str - The char that will be drawn as blank canvas
+    :param plot: str - The char that will be drawn as pixel
     :return: str
     """
     str_out = ""
