@@ -3,8 +3,19 @@ Functions for image / pixel processing
 Written by Oded Erell - CG-Lion Studio (c)2020
 """
 
+from typing import List, Tuple
 
-def cgl_get_pixel_from_uv(u: float, v: float, w: int, h: int) -> tuple[int, int]:
+"""
+Compound type hints:
+"""
+int2 = Tuple[int, int]
+float2 = Tuple[float, float]
+list_int = List[int]
+list_int2 = List[Tuple[int, int]]
+list_list_int = List[List[int]]
+
+
+def cgl_get_pixel_from_uv(u: float, v: float, w: int, h: int) -> int2:
     """
     Returns an Tuple containing 2D integer coordinates
     of the pixel corresponding to the supplied UV coordinates and image width and height in pixels.
@@ -22,7 +33,7 @@ def cgl_get_pixel_from_uv(u: float, v: float, w: int, h: int) -> tuple[int, int]
     return int(round(u * (w - 1))), int(round(v * (h - 1)))
 
 
-def cgl_get_pixel_uv(x, y, w, h):
+def cgl_get_pixel_uv(x: int, y: int, w: int, h: int) -> float2:
     """
     Return a tuple containing floats representing UV coordinates of the center of the supplied pixel.
     :param x: int - the pixel x coordinate
@@ -38,7 +49,7 @@ def cgl_get_pixel_uv(x, y, w, h):
     return (x * px_u_step) + (px_u_step * 0.5), (y * px_v_step) + (px_v_step * 0.5)
 
 
-def cgl_line_raster_pixels(p0, p1):
+def cgl_line_raster_pixels(p0: int2, p1: int2) -> list_int2:
     """
     Returns a list of integer tuples
     representing 2D coordinated of the pixels plotting a line from point 0 to point 1
@@ -52,30 +63,30 @@ def cgl_line_raster_pixels(p0, p1):
     :return: list[tuple[int, int]]
     """
     # store line coords in 2d array:
-    ln = [[p0[0], p0[1]],
-          [p1[0], p1[1]]]
+    ln: list_list_int = [[p0[0], p0[1]],
+                        [p1[0], p1[1]]]
     # Make sure input values ar integers:
     for i in range(2):
         for j in range(2):
             ln[i][j] = int(ln[i][j])
     # Init list of line pixel coordinates - Int tuples
-    line_px = []
+    line_px: list_int2 = []
     # Get x y delta
-    d = [ln[1][0] - ln[0][0],
-         ln[1][1] - ln[0][1]]
+    d: list_int = [ln[1][0] - ln[0][0],
+                   ln[1][1] - ln[0][1]]
     # Set main iteration axis:
-    mx = 0 if abs(d[0]) > abs(d[1]) else 1
+    mx: int = 0 if abs(d[0]) > abs(d[1]) else 1
     # Set if secondary increment is positive or negative
-    inc = 1 if d[1 - mx] >= 0 else -1
+    inc: int = 1 if d[1 - mx] >= 0 else -1
     # Make delta values absolute
     d[0] = abs(d[0])
     d[1] = abs(d[1])
     # Set init derivation:
-    di = (2 * d[1 - mx]) - d[mx]
+    di: int = (2 * d[1 - mx]) - d[mx]
     # Set secondary axis start value:
-    sec = ln[0][1 - mx]
+    sec: int = ln[0][1 - mx]
     # Generate main axis value range:
-    mrange = range(ln[0][mx], ln[1][mx] + 1) if ln[0][mx] < ln[1][mx] else range(ln[0][mx], ln[1][mx] - 1, -1)
+    mrange: range = range(ln[0][mx], ln[1][mx] + 1) if ln[0][mx] < ln[1][mx] else range(ln[0][mx], ln[1][mx] - 1, -1)
     # Interate main axis coordinate range:
     for m in mrange:
         # Define and add new pixel coordinate to list
@@ -91,7 +102,9 @@ def cgl_line_raster_pixels(p0, p1):
     return line_px
 
 
-def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
+def cgl_get_triangle_lines_raster_pixels(p0: int2,
+                                         p1: int2,
+                                         p2: int2) -> list_int2:
     """
     Returns a list of tuples representing the raster pixels of the contour of triangle p0, p1, p2
     :param p0: tuple[int, int] - integer x, y coordinates of pixel 0 of the triangle
@@ -99,14 +112,17 @@ def cgl_get_triangle_lines_raster_pixels(p0, p1, p2):
     :param p2: tuple[int, int] - integer x, y coordinates of pixel 2 of the triangle
     :return: list[tuple[int, int]]
     """
-    points = [p0, p1, p2]
-    tri_px = []
+    points: list_int2 = [p0, p1, p2]
+    tri_px: list_int2 = []
     for i in range(3):
         tri_px += (cgl_line_raster_pixels(points[i], points[(i + 1) % 3]))[1:]
     return tri_px
 
 
-def cgl_get_triangle_raster_pixels(p0, p1, p2, lines=True):
+def cgl_get_triangle_raster_pixels(p0: int2,
+                                   p1: int2,
+                                   p2: int2,
+                                   lines: bool = True) -> list_int2:
     """
     Returns a list of tuples representing the raster pixels of the filled area of triangle p0, p1, p2 (without contours)
     :param p0: tuple[int, int] - integer x, y coordinates of pixel 0 of the triangle
@@ -115,30 +131,34 @@ def cgl_get_triangle_raster_pixels(p0, p1, p2, lines=True):
     :param lines: bool - when True, the output list will include the triangle contours
     :return: list[tuple[int, int]]
     """
-    points = [p0, p1, p2]
-    sorted_y = sorted(points, key=lambda x: x[1])
-    line_a = cgl_line_raster_pixels(sorted_y[0], sorted_y[2])
-    line_b = cgl_line_raster_pixels(sorted_y[0], sorted_y[1])
-    line_c = cgl_line_raster_pixels(sorted_y[1], sorted_y[2])
-    tri_fill = []
-    y_val = line_a[0][1]
+    points: list = [p0, p1, p2]
+    sorted_y: list = sorted(points, key=lambda x: x[1])
+    line_a: list = cgl_line_raster_pixels(sorted_y[0], sorted_y[2])
+    line_b: list = cgl_line_raster_pixels(sorted_y[0], sorted_y[1])
+    line_c: list = cgl_line_raster_pixels(sorted_y[1], sorted_y[2])
+    tri_fill: list = []
+    y_val: int = line_a[0][1]
     for i in list(range(len(line_a)))[1:-1]:
-        new_y_val = line_a[i][1]
+        new_y_val: int = line_a[i][1]
         if new_y_val != y_val:
-            sec_line = line_b if new_y_val <= line_b[-1][1] else line_c
-            sec_index = list(zip(*sec_line))[1].index(new_y_val)
-            x_vals = list(range(line_a[i][0], sec_line[sec_index][0]))[1:]
-            y_vals = [new_y_val] * len(x_vals)
+            sec_line: list = line_b if new_y_val <= line_b[-1][1] else line_c
+            sec_index: int = list(zip(*sec_line))[1].index(new_y_val)
+            x_vals: list = list(range(line_a[i][0], sec_line[sec_index][0]))[1:]
+            y_vals: list = [new_y_val] * len(x_vals)
             tri_fill += zip(x_vals, y_vals)
             y_val = new_y_val
     if lines:
-        outlist = tri_fill + line_a[1:] + line_b[1:] + line_c[1:]
+        outlist: list = tri_fill + line_a[1:] + line_b[1:] + line_c[1:]
     else:
-        outlist = tri_fill
+        outlist: list = tri_fill
     return outlist
 
 
-def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0", plot=" "):
+def cgl_get_pixel_plot_string(canvas_corner_a: int2,
+                              canvas_corner_b: int2,
+                              pixels: list_int2,
+                              blank: str = "0",
+                              plot: str = " ") -> str:
     """
     Returns a string rendering of the supplied canvas coordinated and pixel list.
     Intended to output a graphic raster of ascii chars in an output console
@@ -149,9 +169,9 @@ def cgl_get_pixel_plot_string(canvas_corner_a, canvas_corner_b, pixels, blank="0
     :param plot: str - The char that will be drawn as pixel
     :return: str
     """
-    str_out = ""
-    x_inc = 1 if canvas_corner_b[0] > canvas_corner_a[0] else -1
-    y_inc = 1 if canvas_corner_b[1] > canvas_corner_a[1] else -1
+    str_out: str = ""
+    x_inc: int = 1 if canvas_corner_b[0] > canvas_corner_a[0] else -1
+    y_inc: int = 1 if canvas_corner_b[1] > canvas_corner_a[1] else -1
     for y in range(canvas_corner_a[1], canvas_corner_b[1], x_inc):
         for x in range(canvas_corner_a[0], canvas_corner_b[0], y_inc):
             if (x, y) in pixels:
