@@ -15,6 +15,34 @@ List_Int2 = List[Tuple[int, int]]
 List_List_Int = List[List[int]]
 
 
+def cgl_fill_int_range(begin: int, end: int, ends: bool = True) -> List_Int:
+    """
+    Returns a list of all integers in the range: begin - end regardless of direction.
+    :param begin: int - range start number
+    :param end: int - range end number
+    :param ends: bool - when true the list will contain the begin and end numbers
+    :return: List[int]
+    """
+    endi: int = int(ends)
+    if end > begin:
+        return list(range(begin + (1 - endi), end + endi))
+    elif end < begin:
+        return list(range(begin - (1 - endi), end - endi, -1))
+    else:
+        return []
+
+
+def cgl_det(p0: Int2, p1: Int2, p2: Int2) -> int:
+    """
+    Returns the determinant value of a 3X3 matrix containing the supplied 2D points (considering 1 as the Z component)
+    :param p0: Tuple[int, int]
+    :param p1: Tuple[int, int]
+    :param p2: Tuple[int, int]
+    :return: intTuple[int, int]
+    """
+    return p0[0]*p1[1] + p0[1]*p2[0] + p1[0]*p2[1] - p0[0]*p2[1] - p0[1]*p1[0] - p1[1]*p2[0]
+
+
 def cgl_get_pixel_from_uv(u: float, v: float, w: int, h: int) -> Int2:
     """
     Returns an Tuple containing 2D integer coordinates
@@ -143,12 +171,12 @@ def cgl_get_triangle_raster_pixels(p0: Int2,
         if new_y_val != y_val:
             sec_line: list = line_b if new_y_val <= line_b[-1][1] else line_c
             sec_index: int = list(zip(*sec_line))[1].index(new_y_val)
-            x_vals: list = list(range(line_a[i][0], sec_line[sec_index][0]))[1:]
+            x_vals: list = cgl_fill_int_range(line_a[i][0], sec_line[sec_index][0])
             y_vals: list = [new_y_val] * len(x_vals)
             tri_fill += zip(x_vals, y_vals)
             y_val = new_y_val
     if lines:
-        outlist: list = tri_fill + line_a[1:] + line_b[1:] + line_c[1:]
+        outlist: list = tri_fill + line_a[:-1] + line_b[1:] + line_c[1:]
     else:
         outlist: list = tri_fill
     return outlist
@@ -186,9 +214,10 @@ def cgl_get_pixel_plot_string(canvas_corner_a: Int2,
 Example:
 """
 px0 = cgl_get_pixel_from_uv(0.1, 0.1, 80, 40)
-px1 = cgl_get_pixel_from_uv(0.6, 0.1, 80, 40)
-px2 = cgl_get_pixel_from_uv(0.1, 0.6, 80, 40)
+px1 = cgl_get_pixel_from_uv(0.2, 0.9, 80, 40)
+px2 = cgl_get_pixel_from_uv(0.1, 0.9, 80, 40)
 # pxlist = cgl_line_raster_pixels(px0, px1)
 trilist = cgl_get_triangle_raster_pixels(px0, px1, px2)
+print(cgl_fill_int_range(10, 1))
 output = cgl_get_pixel_plot_string((0, 0), (79, 39), trilist)
 print(output)
