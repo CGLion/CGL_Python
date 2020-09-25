@@ -213,11 +213,12 @@ def cgl_get_pixel_plot_string(canvas_corner_a: Int2,
 """
 Example:
 """
-px0 = cgl_get_pixel_from_uv(0.1, 0.1, 80, 40)
-px1 = cgl_get_pixel_from_uv(0.2, 0.9, 80, 40)
-px2 = cgl_get_pixel_from_uv(0.1, 0.9, 80, 40)
-# pxlist = cgl_line_raster_pixels(px0, px1)
-trilist = cgl_get_triangle_raster_pixels(px0, px1, px2)
-print(cgl_fill_int_range(10, 1))
-output = cgl_get_pixel_plot_string((0, 0), (79, 39), trilist)
-print(output)
+if __name__ == '__main__':
+    px0 = cgl_get_pixel_from_uv(0.1, 0.1, 80, 40)
+    px1 = cgl_get_pixel_from_uv(0.2, 0.9, 80, 40)
+    px2 = cgl_get_pixel_from_uv(0.1, 0.9, 80, 40)
+    # pxlist = cgl_line_raster_pixels(px0, px1)
+    trilist = cgl_get_triangle_raster_pixels(px0, px1, px2)
+    print(cgl_fill_int_range(10, 1))
+    output = cgl_get_pixel_plot_string((0, 0), (79, 39), trilist)
+    print(output)
